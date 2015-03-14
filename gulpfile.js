@@ -12,6 +12,8 @@ var ghPages = require('gulp-gh-pages');
 var less = require('gulp-less');
 var path = require('path');
 var minifyCSS = require('gulp-minify-css');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 
 var getBundleName = function () {
   var version = require('./package.json').version;
@@ -21,6 +23,12 @@ var getBundleName = function () {
 
 gulp.task('connect', function () {
   connect.server();
+});
+
+gulp.task('lint', function() {
+  return gulp.src('./components/**/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
 });
 
 gulp.task('less', function () {
@@ -47,7 +55,7 @@ gulp.task('javascript', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['**/*.js', '**/*.json', '**/*.less'], ['javascript', 'less']);
+  gulp.watch(['**/*.js', '**/*.json', '**/*.less'], ['lint', 'javascript', 'less']);
 });
 
 gulp.task('deploy', ['javascript'], function () {
@@ -57,5 +65,5 @@ gulp.task('deploy', ['javascript'], function () {
       }));
 });
 
-gulp.task('dev', ['javascript', 'less', 'connect', 'watch']);
-gulp.task('default', ['javascript', 'less']);
+gulp.task('dev', ['lint', 'javascript', 'less', 'connect', 'watch']);
+gulp.task('default', ['lint', 'javascript', 'less']);
