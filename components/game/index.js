@@ -2,11 +2,13 @@
   'use strict';
 
   var Util = require('../util/');
-  Util.shim.rAF.install();
+  var Grid = require('../grid');
 
   var Game = function (canvasNodeId) {
     this.canvas = document.getElementById(canvasNodeId);
     this.ctx = this.canvas.getContext('2d');
+
+    this.grid = new Grid();
 
     // Re-bind
     this.run = this.run.bind(this);
@@ -15,6 +17,8 @@
   };
 
   Game.prototype.initialize = function () {
+    Util.shim.rAF.install();
+
     this.run();
   };
 
@@ -26,11 +30,11 @@
   };
 
   Game.prototype.tick = function () {
-    console.log('Tick');
+    this.grid.tick();
   };
 
   Game.prototype.draw = function (ctx) {
-    console.log('Draw');
+    this.grid.draw(ctx);
   };
 
   module.exports = Game;

@@ -3,5 +3,6 @@
 
   module.exports = {
     'rAF' : require('./rAF')
-  }
+  };
+
 }());
