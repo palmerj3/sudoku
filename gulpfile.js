@@ -86,7 +86,8 @@ gulp.task('test', ['clean', 'compile_tests'], function (done) {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['**/*.js', '**/*.json', '**/*.less'], ['lint', 'javascript', 'less']);
+  gulp.watch('components/**/*.js', ['javascript']);
+  gulp.watch('components/**/*.less', ['less']);
 });
 
 gulp.task('deploy', ['javascript'], function () {
