@@ -23,7 +23,7 @@
   };
 
   Game.prototype.gameLoop = function () {
-    requestAnimFrame(this.run);
+    requestAnimFrame(this.gameLoop);
 
     this.tick();
     this.draw(this.ctx);

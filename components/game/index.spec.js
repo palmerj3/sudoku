@@ -27,7 +27,7 @@ describe('Game', function () {
     it('should have requestAnimFrame', function () {
       game.initialize();
 
-      expect(window.requestAnimFrame).to.exist
+      expect(window.requestAnimFrame).to.exist;
     });
 
     it('Gameloop should be called', function () {
