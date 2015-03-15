@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var Util = require('../util/');
+  var Util = require('../util');
   var Grid = require('../grid');
 
   var Game = function (canvasNodeId) {
@@ -11,7 +11,7 @@
     this.grid = new Grid();
 
     // Re-bind
-    this.run = this.run.bind(this);
+    this.gameLoop = this.gameLoop.bind(this);
     this.tick = this.tick.bind(this);
     this.draw = this.draw.bind(this);
   };
@@ -19,10 +19,10 @@
   Game.prototype.initialize = function () {
     Util.shim.rAF.install();
 
-    this.run();
+    this.gameLoop();
   };
 
-  Game.prototype.run = function () {
+  Game.prototype.gameLoop = function () {
     requestAnimFrame(this.run);
 
     this.tick();
