@@ -13,8 +13,8 @@
     this.state = {
       mouseclick : null,
       canvasSize : {
-        h: this.canvas.height,
-        w: this.canvas.width
+        h: window.innerWidth / 2,
+        w: window.innerWidth / 2
       }
     };
 
@@ -58,8 +58,18 @@
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       };
+    }, false);
 
-    });
+    window.addEventListener('touchstart', function (e) {
+      e.preventDefault();
+
+      var rect = self.canvas.getBoundingClientRect();
+
+      self.state.mouseclick = {
+        x: e.targetTouches[0].pageX - rect.left,
+        y: e.targetTouches[0].pageY - rect.top
+      };
+    }, false);
   };
 
   Game.prototype.gameLoop = function () {
