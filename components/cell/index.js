@@ -35,13 +35,51 @@
         gameState.mouseclick.y <= (this.state.scaledPosition.y + this.state.scaledSize)
       ) {
         this.state.highlighted = true;
-        console.log('highlighted');
+      } else {
+        this.state.highlighted = false;
       }
+    }
+  };
+
+  Cell.prototype.updateAnnotationsOverlay = function (gameState) {
+    if (gameState.mouseposition !== null) {
+      if (
+        gameState.mouseposition.x >= this.state.scaledPosition.x &&
+        gameState.mouseposition.y >= this.state.scaledPosition.y &&
+        gameState.mouseposition.x <= (this.state.scaledPosition.x + this.state.scaledSize) &&
+        gameState.mouseposition.y <= (this.state.scaledPosition.y + this.state.scaledSize)
+      ) {
+        this.state.showAnnotationsOverlay = true;
+      } else {
+        this.state.showAnnotationsOverlay = false;
+      }
+    }
+  };
+
+  Cell.prototype.drawAnnotationSelector = function (ctx) {
+    var annotationSelectionWidth = this.state.scaledSize / 3,
+        heightOffset = 0,
+        nudgeOffset = this.state.scaledSize * 0.06,
+        scaledFontSize = this.state.scaledSize * 0.3;
+
+    for (var i=0; i < 9; i++) {
+      if (i % 3 === 0) {
+        heightOffset++;
+      }
+
+      ctx.font = scaledFontSize + "px serif";
+      ctx.fillStyle = '#cccccc';
+      ctx.fillText(
+        i+1,
+        nudgeOffset+this.state.scaledPosition.x + (i % 3) * annotationSelectionWidth,
+        (nudgeOffset*-1)+this.state.scaledPosition.y + (heightOffset) * annotationSelectionWidth
+      );
     }
   };
 
   Cell.prototype.tick = function (gameState) {
     this.updateBoundingBox(gameState);
+    this.updateAnnotationsOverlay(gameState);
     this.updateHighlighting(gameState);
   };
 
@@ -53,6 +91,10 @@
         this.state.scaledSize,
         this.state.scaledSize
       );
+    }
+
+    if (this.state.showAnnotationsOverlay === true) {
+      this.drawAnnotationSelector(ctx);
     }
   };
 
