@@ -1,32 +1,25 @@
 (function() {
   'use strict';
 
+  var Cell = require('../cell');
+
   var Grid = function() {
     this.state = {
-      highlights : {}
+      highlights : {},
+      cells: {}
     }
+
+    this.initializeCells();
   };
 
-  Grid.prototype.handleMouseClick = function (gamestate) {
-    var cellWidth = gamestate.canvasSize.w / 9,
-        cellHeight = gamestate.canvasSize.h / 9,
-        cellX = Math.floor(gamestate.mouseclick.x/cellWidth)*cellWidth,
-        cellY = Math.floor(gamestate.mouseclick.y/cellHeight)*cellHeight,
-        key = Math.floor(cellX/cellWidth) + '-' + Math.floor(cellY/cellHeight);
+  Grid.prototype.initializeCells = function () {
+    for (var x=0; x < 9; x++) {
+      for (var y=0; y < 9; y++) {
+        var key = x + '-' + y;
 
-    console.log('Canvas Dimensions (', gamestate.canvasSize.w, 'x' , gamestate.canvasSize.h, ')');
-    console.log('Cell Dimensions(', cellWidth, 'x' , cellHeight, ')');
-    console.log('Cell Coords (', cellX, ',' , cellY, ')');
-    console.log('Click Coords (', gamestate.mouseclick.x, ',' , gamestate.mouseclick.y, ')');
-    console.log('Key', key);
-
-    if (!this.state.highlights.hasOwnProperty(key)) {
-      this.state.highlights[key] = 'selected';
-    } else {
-      delete(this.state.highlights[key]);
+        this.state.cells[key] = new Cell(key);
+      }
     }
-
-    gamestate.mouseclick = null;
   };
 
   Grid.prototype.drawGrid = function (ctx) {
@@ -34,7 +27,6 @@
         height = ctx.canvas.height,
         lineWidth = width / 9,
         lineHeight = height / 9;
-
 
     ctx.lineWidth = 5;
     ctx.strokeRect(0, 0, width, height);
@@ -70,33 +62,25 @@
     }
   };
 
-  Grid.prototype.drawHighlights = function (ctx) {
-    var cellWidth = ctx.canvas.width / 9,
-        cellHeight = ctx.canvas.height / 9;
-
-    for (var h in this.state.highlights) {
-      if (!this.state.highlights.hasOwnProperty(h)) continue;
-
-      var h_x = Number(h.split('-')[0]),
-          h_y = Number(h.split('-')[1]),
-          cellX = h_x*cellWidth,
-          cellY = h_y*cellHeight;
-
-      //console.log('Highlight: (', cellX, ',', cellY, ')');
-
-      ctx.fillRect(cellX, cellY, cellWidth, cellHeight);
-    }
-  };
-
   Grid.prototype.tick = function (gameState) {
-    if (gameState.mouseclick !== null) {
-      this.handleMouseClick(gameState);
+    for (var c in this.state.cells) {
+      if (!this.state.cells.hasOwnProperty(c)) continue;
+
+      this.state.cells[c].tick(gameState);
     }
+
+    console.log(this.state.cells['0-0'].state.scaledPosition);
+    console.log(this.state.cells['0-0'].state.scaledSize);
   };
 
   Grid.prototype.draw = function (ctx) {
     this.drawGrid(ctx);
-    this.drawHighlights(ctx);
+
+    for (var c in this.state.cells) {
+      if (!this.state.cells.hasOwnProperty(c)) continue;
+
+      this.state.cells[c].draw(ctx);
+    }
   };
 
   module.exports = Grid;

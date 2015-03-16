@@ -12,11 +12,14 @@
 
     this.state = {
       mouseclick : null,
+      mouseposition : null,
       canvasSize : {
         h: window.innerWidth / 2,
         w: window.innerWidth / 2
       }
     };
+
+    this.updateCanvasSize();
 
     // Re-bind so we can unbind and maintain function ref
     this.gameLoop = this.gameLoop.bind(this);
@@ -34,6 +37,11 @@
     this.gameLoop();
   };
 
+  Game.prototype.updateCanvasSize = function () {
+    this.canvas.width = this.state.canvasSize.w;
+    this.canvas.height = this.state.canvasSize.h;
+  };
+
   Game.prototype.listenForWindowResize = function () {
     var self = this;
 
@@ -49,7 +57,16 @@
   Game.prototype.listenForUserInput = function () {
     var self = this;
 
-    window.addEventListener('click', function (e) {
+    this.canvas.addEventListener('mousemove', function (e) {
+      var rect = self.canvas.getBoundingClientRect();
+
+      self.state.mouseposition = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    });
+
+    this.canvas.addEventListener('click', function (e) {
       e.preventDefault();
 
       var rect = self.canvas.getBoundingClientRect();
@@ -60,7 +77,7 @@
       };
     }, false);
 
-    window.addEventListener('touchstart', function (e) {
+    this.canvas.addEventListener('touchstart', function (e) {
       e.preventDefault();
 
       var rect = self.canvas.getBoundingClientRect();
