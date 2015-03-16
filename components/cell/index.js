@@ -12,6 +12,7 @@
       value: null,
       annotations: [],
       showAnnotationsOverlay: false,
+      annotationHighlighted: null,
       highlighted: false
     };
   };
@@ -50,6 +51,12 @@
         gameState.mouseposition.y <= (this.state.scaledPosition.y + this.state.scaledSize)
       ) {
         this.state.showAnnotationsOverlay = true;
+
+        // Note if any overlay text is hovered over
+        var annotationRow = Math.floor((gameState.mouseposition.y - this.state.scaledPosition.y) / (this.state.scaledSize / 3));
+        var annotationCol = Math.floor((gameState.mouseposition.x - this.state.scaledPosition.x) / (this.state.scaledSize / 3));
+
+        this.state.annotationHighlighted = annotationCol + (annotationRow * 3);
       } else {
         this.state.showAnnotationsOverlay = false;
       }
@@ -68,7 +75,13 @@
       }
 
       ctx.font = scaledFontSize + "px serif";
-      ctx.fillStyle = '#cccccc';
+      
+      if (this.state.annotationHighlighted === i) {
+        ctx.fillStyle = '#ff0000';
+      } else {
+        ctx.fillStyle = '#cccccc';
+      }
+      
       ctx.fillText(
         i+1,
         nudgeOffset+this.state.scaledPosition.x + (i % 3) * annotationSelectionWidth,
