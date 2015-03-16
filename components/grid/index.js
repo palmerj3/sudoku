@@ -68,9 +68,6 @@
 
       this.state.cells[c].tick(gameState);
     }
-
-    console.log(this.state.cells['0-0'].state.scaledPosition);
-    console.log(this.state.cells['0-0'].state.scaledSize);
   };
 
   Grid.prototype.draw = function (ctx) {

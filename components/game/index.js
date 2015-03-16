@@ -13,6 +13,7 @@
     this.state = {
       mouseclick : null,
       mouseposition : null,
+      mousedblclick : null,
       canvasSize : {
         h: window.innerWidth / 2,
         w: window.innerWidth / 2
@@ -77,6 +78,18 @@
       };
     }, false);
 
+    this.canvas.addEventListener('dblclick', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var rect = self.canvas.getBoundingClientRect();
+
+      self.state.mousedblclick = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }, false);
+
     this.canvas.addEventListener('touchstart', function (e) {
       e.preventDefault();
 
@@ -100,7 +113,7 @@
     this.grid.tick(this.state);
 
     this.state.mouseclick = null;
-    //this.state.mouseposition = null;
+    this.state.mousedblclick = null;
   };
 
   Game.prototype.draw = function (ctx) {
