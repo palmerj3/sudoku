@@ -64,7 +64,7 @@
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       };
-    });
+    }, false);
 
     this.canvas.addEventListener('click', function (e) {
       e.preventDefault();
@@ -98,6 +98,9 @@
 
   Game.prototype.tick = function () {
     this.grid.tick(this.state);
+
+    this.state.mouseclick = null;
+    //this.state.mouseposition = null;
   };
 
   Game.prototype.draw = function (ctx) {

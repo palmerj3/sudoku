@@ -42,7 +42,9 @@
     }
   };
 
-  Cell.prototype.updateAnnotationsOverlay = function (gameState) {
+  Cell.prototype.updateAnnotationsOverlayState = function (gameState) {
+    this.state.showAnnotationsOverlay = false;
+
     if (gameState.mouseposition !== null) {
       if (
         gameState.mouseposition.x >= this.state.scaledPosition.x &&
@@ -53,12 +55,45 @@
         this.state.showAnnotationsOverlay = true;
 
         // Note if any overlay text is hovered over
-        var annotationRow = Math.floor((gameState.mouseposition.y - this.state.scaledPosition.y) / (this.state.scaledSize / 3));
-        var annotationCol = Math.floor((gameState.mouseposition.x - this.state.scaledPosition.x) / (this.state.scaledSize / 3));
+        var annotationRow = Math.floor(
+          (gameState.mouseposition.y - this.state.scaledPosition.y) / 
+          (this.state.scaledSize / 3));
+        var annotationCol = Math.floor((
+          gameState.mouseposition.x - this.state.scaledPosition.x) / 
+          (this.state.scaledSize / 3));
 
         this.state.annotationHighlighted = annotationCol + (annotationRow * 3);
-      } else {
-        this.state.showAnnotationsOverlay = false;
+      }
+    }
+  };
+
+  Cell.prototype.updateCellClickState = function (gameState) {
+    if (gameState.mouseclick !== null) {
+      if (
+        gameState.mouseclick.x >= this.state.scaledPosition.x &&
+        gameState.mouseclick.y >= this.state.scaledPosition.y &&
+        gameState.mouseclick.x <= (this.state.scaledPosition.x + this.state.scaledSize) &&
+        gameState.mouseclick.y <= (this.state.scaledPosition.y + this.state.scaledSize)
+      ) {
+
+        // Note if any overlay text is hovered over
+        var annotationRow = Math.floor(
+          (gameState.mouseposition.y - this.state.scaledPosition.y) / 
+          (this.state.scaledSize / 3));
+        var annotationCol = Math.floor((
+          gameState.mouseposition.x - this.state.scaledPosition.x) / 
+          (this.state.scaledSize / 3));
+
+        var annotationSelected = annotationCol + (annotationRow * 3);
+
+        if (this.state.annotations.indexOf(annotationSelected) > -1) {
+          this.state.annotations.splice(
+            this.state.annotations.indexOf(annotationSelected),
+            0
+          );
+        } else {
+          this.state.annotations.push(annotationSelected);
+        }
       }
     }
   };
@@ -90,25 +125,52 @@
     }
   };
 
+  Cell.prototype.drawAnnotations = function (ctx) {
+    var annotationSelectionWidth = this.state.scaledSize / 3,
+        heightOffset = 0,
+        nudgeOffset = this.state.scaledSize * 0.06,
+        scaledFontSize = this.state.scaledSize * 0.3;
+
+    for (var i=0; i < 9; i++) {
+      if (i % 3 === 0) {
+        heightOffset++;
+      }
+
+      ctx.font = scaledFontSize + "px serif";
+      ctx.fillStyle = '#ff0000';
+      
+      if (this.state.annotations.indexOf(i) > -1) {
+        ctx.fillText(
+          i+1,
+          nudgeOffset+this.state.scaledPosition.x + (i % 3) * annotationSelectionWidth,
+          (nudgeOffset*-1)+this.state.scaledPosition.y + (heightOffset) * annotationSelectionWidth
+        );
+      }
+    }
+  };
+
   Cell.prototype.tick = function (gameState) {
     this.updateBoundingBox(gameState);
-    this.updateAnnotationsOverlay(gameState);
+    this.updateAnnotationsOverlayState(gameState);
     this.updateHighlighting(gameState);
+    this.updateCellClickState(gameState);
   };
 
   Cell.prototype.draw = function (ctx) {
-    if (this.state.highlighted === true) {
-      ctx.fillRect(
-        this.state.scaledPosition.x,
-        this.state.scaledPosition.y,
-        this.state.scaledSize,
-        this.state.scaledSize
-      );
-    }
+    // if (this.state.highlighted === true) {
+    //   ctx.fillRect(
+    //     this.state.scaledPosition.x,
+    //     this.state.scaledPosition.y,
+    //     this.state.scaledSize,
+    //     this.state.scaledSize
+    //   );
+    // }
 
     if (this.state.showAnnotationsOverlay === true) {
       this.drawAnnotationSelector(ctx);
     }
+
+    this.drawAnnotations(ctx);
   };
 
   module.exports = Cell;
