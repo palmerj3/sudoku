@@ -53,4 +53,8 @@
     '4-8': 5,
     '7-8': 3
   });
+
+  game.checkIfWon();
+
+  window.game = game;
 }());

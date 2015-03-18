@@ -48,24 +48,50 @@
     }
   };
 
-  Game.prototype.checkIfWon = function () {
-    // Check squares
-    
-    for (var s = 1; s < 8; s++) {
+  Game.prototype.checkIfWon = function () {    
+    // Check rows and cols for uniqueness
+    for (var x = 0; x < 9; x++) {
+      var rowUniq = [],
+          colUniq = [];
+
+      for (var y = 0; y < 9; y++) {
+        var rowKey = x + '-' + y,
+            colKey = y + '-' + x,
+            rowVal = this.grid.state.cells[rowKey].state.value,
+            colVal = this.grid.state.cells[colKey].state.value;
+
+        if (rowUniq.indexOf(rowVal) > -1 || colUniq.indexOf(colVal) > -1) {
+          return false;
+        }
+
+        rowUniq.push(rowVal);
+        colUniq.push(colVal);
+      }
+    }
+
+    // Check big blocks for uniqueness
+    for (var s = 0; s < 3; s++) {
       var vals = [];
 
-      for (var x = 0; x < 3; x++) {
-        for (var y = 0; y < 3; y++) {
-          var key = (s*x) + '-' + (s*y);
+      for (var x = s*3; x < s*3+3; x++) {
+        for (var y = s*3; y < s*3+3; y++) {
+          var key = (x) + '-' + (y),
+              val = this.grid.state.cells[key].state.value;
 
-          if (this.grid.state.cells[key].value !== null) {
-            vals.push(this.grid.state.cells[key].value);
+          if (val === null) {
+            return false;
           } else {
-            return;
+            if (vals.indexOf(val) > -1) {
+              return false;
+            } else {
+              vals.push(val);
+            }
           }
         }
       }
     }
+
+    return true;
   };
 
   Game.prototype.updateCanvasSize = function () {
