@@ -14,6 +14,7 @@
       mouseclick : null,
       mouseposition : null,
       mousedblclick : null,
+      isWon: false,
       canvasSize : {
         h: window.innerWidth / 2,
         w: window.innerWidth / 2
@@ -36,6 +37,35 @@
     this.listenForWindowResize();
 
     this.gameLoop();
+  };
+
+  Game.prototype.loadGame = function (cells) {
+    for (var c in cells) {
+      if (!cells.hasOwnProperty(c)) continue;
+
+      this.grid.state.cells[c].state.value = cells[c];
+      this.grid.state.cells[c].state.valueUserEntered = false;
+    }
+  };
+
+  Game.prototype.checkIfWon = function () {
+    // Check squares
+    
+    for (var s = 1; s < 8; s++) {
+      var vals = [];
+
+      for (var x = 0; x < 3; x++) {
+        for (var y = 0; y < 3; y++) {
+          var key = (s*x) + '-' + (s*y);
+
+          if (this.grid.state.cells[key].value !== null) {
+            vals.push(this.grid.state.cells[key].value);
+          } else {
+            return;
+          }
+        }
+      }
+    }
   };
 
   Game.prototype.updateCanvasSize = function () {

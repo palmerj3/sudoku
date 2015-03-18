@@ -10,6 +10,7 @@
       },
       scaledSize: null,
       value: null,
+      valueUserEntered: true,
       annotations: [],
       showAnnotationsOverlay: false,
       annotationHighlighted: null,
@@ -68,7 +69,7 @@
   };
 
   Cell.prototype.updateCellClickState = function (gameState) {
-    if (gameState.mouseclick !== null) {
+    if (gameState.mouseclick !== null && this.state.value === null) {
       if (
         gameState.mouseclick.x >= this.state.scaledPosition.x &&
         gameState.mouseclick.y >= this.state.scaledPosition.y &&
@@ -99,7 +100,7 @@
   };
 
   Cell.prototype.updateCellDblClickState = function (gameState) {
-    if (gameState.mousedblclick !== null) {
+    if (gameState.mousedblclick !== null && this.state.valueUserEntered === true) {
       if (
         gameState.mousedblclick.x >= this.state.scaledPosition.x &&
         gameState.mousedblclick.y >= this.state.scaledPosition.y &&
@@ -189,12 +190,17 @@
   Cell.prototype.drawValue = function (ctx) {
     if (this.state.value !== null) {
       ctx.font = this.state.scaledSize * 0.6 + "px serif";
-      ctx.fillStyle = '#ff0000';
-
+      
+      if (this.state.valueUserEntered === true) {
+        ctx.fillStyle = '#ff0000';  
+      } else {
+        ctx.fillStyle = '#000000';
+      }
+      
       ctx.fillText(
         this.state.value,
-        this.state.scaledPosition.x + (this.state.scaledSize * 0.6 / 2),
-        this.state.scaledPosition.y + (this.state.scaledSize * 0.6)
+        2+this.state.scaledPosition.x + (this.state.scaledSize * 0.6 / 2),
+        5+this.state.scaledPosition.y + (this.state.scaledSize * 0.6)
       );
     }
   };
