@@ -11,6 +11,7 @@
     this.grid = new Grid();
 
     this.state = {
+      isMobile : window.innerWidth < 768,
       mouseclick : null,
       mouseposition : null,
       mousedblclick : null,
@@ -96,7 +97,9 @@
   };
 
   Game.prototype.updateCanvasSize = function () {
-    var width = window.innerWidth < 768 ? window.innerWidth : 500;
+    this.state.isMobile = window.innerWidth < 768;
+
+    var width = this.state.isMobile ? window.innerWidth : 500;
 
     this.state.canvasSize.w = width;
     this.state.canvasSize.h = width;

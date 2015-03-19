@@ -28,23 +28,12 @@
     this.state.scaledPosition.y = Number(this.state.position.split('-')[1]) * cellHeight;
   };
 
-  Cell.prototype.updateHighlighting = function (gameState) {
-    if (gameState.mouseclick !== null) {
-      if (
-        gameState.mouseclick.x >= this.state.scaledPosition.x &&
-        gameState.mouseclick.y >= this.state.scaledPosition.y &&
-        gameState.mouseclick.x <= (this.state.scaledPosition.x + this.state.scaledSize) &&
-        gameState.mouseclick.y <= (this.state.scaledPosition.y + this.state.scaledSize)
-      ) {
-        this.state.highlighted = true;
-      } else {
-        this.state.highlighted = false;
-      }
-    }
-  };
-
   Cell.prototype.updateAnnotationsOverlayState = function (gameState) {
-    this.state.showAnnotationsOverlay = false;
+    
+    if (gameState.isMobile === false) {
+      // Clear annotations overlay since it is triggered via mouse over
+      this.state.showAnnotationsOverlay = false;
+    }
 
     if (gameState.mouseposition !== null && this.state.value === null) {
       if (
@@ -77,23 +66,27 @@
         gameState.mouseclick.y <= (this.state.scaledPosition.y + this.state.scaledSize)
       ) {
 
-        // Note if any overlay text is hovered over
-        var annotationRow = Math.floor(
-          (gameState.mouseclick.y - this.state.scaledPosition.y) / 
-          (this.state.scaledSize / 3));
-        var annotationCol = Math.floor((
-          gameState.mouseclick.x - this.state.scaledPosition.x) / 
-          (this.state.scaledSize / 3));
-
-        var annotationSelected = annotationCol + (annotationRow * 3);
-
-        if (this.state.annotations.indexOf(annotationSelected) > -1) {
-          this.state.annotations.splice(
-            this.state.annotations.indexOf(annotationSelected),
-            1
-          );
+        if (gameState.isMobile === true && this.state.showAnnotationsOverlay === false) {
+          this.state.showAnnotationsOverlay = true;
         } else {
-          this.state.annotations.push(annotationSelected);
+          // Note if any overlay text is hovered over
+          var annotationRow = Math.floor(
+            (gameState.mouseclick.y - this.state.scaledPosition.y) / 
+            (this.state.scaledSize / 3));
+          var annotationCol = Math.floor((
+            gameState.mouseclick.x - this.state.scaledPosition.x) / 
+            (this.state.scaledSize / 3));
+
+          var annotationSelected = annotationCol + (annotationRow * 3);
+
+          if (this.state.annotations.indexOf(annotationSelected) > -1) {
+            this.state.annotations.splice(
+              this.state.annotations.indexOf(annotationSelected),
+              1
+            );
+          } else {
+            this.state.annotations.push(annotationSelected);
+          }
         }
       }
     }
@@ -208,21 +201,11 @@
   Cell.prototype.tick = function (gameState) {
     this.updateBoundingBox(gameState);
     this.updateAnnotationsOverlayState(gameState);
-    this.updateHighlighting(gameState);
     this.updateCellClickState(gameState);
     this.updateCellDblClickState(gameState);
   };
 
   Cell.prototype.draw = function (ctx) {
-    // if (this.state.highlighted === true) {
-    //   ctx.fillRect(
-    //     this.state.scaledPosition.x,
-    //     this.state.scaledPosition.y,
-    //     this.state.scaledSize,
-    //     this.state.scaledSize
-    //   );
-    // }
-
     this.drawAnnotationSelector(ctx);
     this.drawAnnotations(ctx);
     this.drawValue(ctx);
