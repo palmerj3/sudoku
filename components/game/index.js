@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  var Hammer = require('hammerjs');
+
   var Util = require('../util');
   var Grid = require('../grid');
 
@@ -115,6 +117,8 @@
   Game.prototype.listenForUserInput = function () {
     var self = this;
 
+    var hammertime = new Hammer(this.canvas);
+
     this.canvas.addEventListener('mousemove', function (e) {
       var rect = self.canvas.getBoundingClientRect();
 
@@ -124,39 +128,25 @@
       };
     }, false);
 
-    this.canvas.addEventListener('click', function (e) {
+    hammertime.on('tap', function (e) {
       e.preventDefault();
 
       var rect = self.canvas.getBoundingClientRect();
 
-      self.state.mouseclick = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }, false);
+      if (e.tapCount === 1) {
+        self.state.mouseclick = {
+          x: e.center.x - rect.left,
+          y: e.center.y - rect.top
+        };
+      }
 
-    this.canvas.addEventListener('dblclick', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      var rect = self.canvas.getBoundingClientRect();
-
-      self.state.mousedblclick = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }, false);
-
-    this.canvas.addEventListener('touchstart', function (e) {
-      e.preventDefault();
-
-      var rect = self.canvas.getBoundingClientRect();
-
-      self.state.mouseclick = {
-        x: e.targetTouches[0].pageX - rect.left,
-        y: e.targetTouches[0].pageY - rect.top
-      };
-    }, false);
+      if (e.tapCount === 2) {
+        self.state.mousedblclick = {
+          x: e.center.x - rect.left,
+          y: e.center.y - rect.top
+        };
+      }
+    });
   };
 
   Game.prototype.drawWinScreen = function (ctx) {
