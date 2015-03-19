@@ -16,8 +16,8 @@
       mousedblclick : null,
       isWon: false,
       canvasSize : {
-        h: window.innerWidth / 2,
-        w: window.innerWidth / 2
+        h: null,
+        w: null
       }
     };
 
@@ -28,6 +28,7 @@
     this.tick = this.tick.bind(this);
     this.draw = this.draw.bind(this);
     this.listenForUserInput = this.listenForUserInput.bind(this);
+    this.updateCanvasSize = this.updateCanvasSize.bind(this);
   };
 
   Game.prototype.initialize = function () {
@@ -95,20 +96,17 @@
   };
 
   Game.prototype.updateCanvasSize = function () {
+    var width = window.innerWidth < 768 ? window.innerWidth : 500;
+
+    this.state.canvasSize.w = width;
+    this.state.canvasSize.h = width;
+
     this.canvas.width = this.state.canvasSize.w;
     this.canvas.height = this.state.canvasSize.h;
   };
 
   Game.prototype.listenForWindowResize = function () {
-    var self = this;
-
-    window.addEventListener('resize', function (e) {
-      self.state.canvasSize.h = window.innerWidth / 2;
-      self.state.canvasSize.w = window.innerWidth / 2;
-
-      self.canvas.width = self.state.canvasSize.w;
-      self.canvas.height = self.state.canvasSize.h;
-    });
+    window.addEventListener('resize', this.updateCanvasSize);
   };
 
   Game.prototype.listenForUserInput = function () {
@@ -158,6 +156,17 @@
     }, false);
   };
 
+  Game.prototype.drawWinScreen = function (ctx) {
+    var scaledFontSize = ctx.canvas.width * 0.2;
+    ctx.font = scaledFontSize + "px serif";
+
+    ctx.fillText(
+      'You won!',
+      (ctx.canvas.width / 2) - scaledFontSize * 2,
+      (ctx.canvas.height / 2)
+    );
+  };
+
   Game.prototype.gameLoop = function () {
     requestAnimFrame(this.gameLoop);
 
@@ -166,15 +175,21 @@
   };
 
   Game.prototype.tick = function () {
-    this.grid.tick(this.state);
+    if (this.checkIfWon() === false) {
+      this.grid.tick(this.state);
+    }
 
     this.state.mouseclick = null;
     this.state.mousedblclick = null;
   };
 
   Game.prototype.draw = function (ctx) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.grid.draw(ctx);
+    if (this.checkIfWon() === false) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.grid.draw(ctx);
+    } else {
+      this.drawWinScreen(ctx);
+    }
   };
 
   module.exports = Game;

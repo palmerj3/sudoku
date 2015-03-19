@@ -1,15 +1,31 @@
 html, body {
   margin: 0;
   padding: 0;
+
+  @media (min-width:768px) {
+    background-image: url('/static/images/bg.jpg');
+    background-size: 100%;
+    background-repeat: no-repeat;
+  }
 }
 
 #container {
   width: 100%;
 
-  #game {
-    width: 50%;
-    display: block;
+  @media (min-width:768px) {
+    padding-top: 50px;
+  }
 
+  #game {
+    background-color: #ffffff;
+
+    @media (min-width:768px) {
+      width: 500px;
+    }
+    @media (min-width:320px) and (max-width:767px) {
+      width: 100%;
+    }
+    display: block;
     margin: 0 auto;
   }
 }
