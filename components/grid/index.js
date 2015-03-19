@@ -4,22 +4,30 @@
   var Cell = require('../cell');
 
   var Grid = function() {
+    this.config = {
+      boxWidth: 5,
+      gridWidth: 1,
+      gridColor: '#000000'
+    };
+
     this.state = {
       highlights : {},
-      cells: {}
+      cells: this.initializeCells()
     }
-
-    this.initializeCells();
   };
 
   Grid.prototype.initializeCells = function () {
+    var cellHash = {};
+
     for (var x=0; x < 9; x++) {
       for (var y=0; y < 9; y++) {
         var key = x + '-' + y;
 
-        this.state.cells[key] = new Cell(key);
+        cellHash[key] = new Cell(key);
       }
     }
+
+    return cellHash;
   };
 
   Grid.prototype.drawGrid = function (ctx) {
@@ -28,7 +36,7 @@
         lineWidth = width / 9,
         lineHeight = height / 9;
 
-    ctx.lineWidth = 5;
+    ctx.lineWidth = this.config.boxWidth;
     ctx.strokeRect(0, 0, width, height);
 
     for (var x=1; x < 9; x++) {
@@ -38,9 +46,9 @@
       ctx.lineTo(x * lineWidth, height);
 
       if (x % 3 === 0) {
-        ctx.lineWidth = 5;
+        ctx.lineWidth = this.config.boxWidth;
       } else {
-        ctx.lineWidth = 1;
+        ctx.lineWidth = this.config.gridWidth;
       }
 
       ctx.stroke();
