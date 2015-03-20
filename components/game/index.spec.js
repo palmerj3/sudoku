@@ -406,4 +406,28 @@ describe('Game', function () {
       expect(gameResult).to.equal(false);
     });
   });
+
+  describe('#draw', function () {
+
+    beforeEach(function () {
+      game = new Game('game');
+      game.initialize();
+    });
+
+    it('should call grid draw if game not won', function () {
+      sinon.spy(game.state.grid, 'draw');
+
+      game.draw(game.ctx);
+
+      expect(game.state.grid.draw).to.have.been.called;
+    });
+
+    it('should call drawWinScreen if game won', function () {
+      sinon.spy(game, 'drawWinScreen');
+      sinon.stub(game, 'checkIfWon').returns(true);
+      game.draw(game.ctx);
+
+      expect(game.drawWinScreen).to.have.been.called;
+    });
+  });
 });

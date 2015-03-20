@@ -2,6 +2,24 @@
   'use strict';
 
   var Cell = function (position) {
+    this.config = {
+      annotations: {
+        font: 'serif',
+        fontSize: 0.3,
+        padding: 0.06,
+        color: '#cccccc',
+        hoverColor: '#ff0000'
+      },
+      selection: {
+        font: 'serif',
+        fontSize: 0.6,
+        userSelectedColor: '#ff0000',
+        nonMutableColor: '#000000',
+        paddingLeft: 2,
+        paddingTop: 5
+      }
+    };
+
     this.state = {
       position: position,
       scaledPosition: {
@@ -116,8 +134,6 @@
           this.state.annotations = [];
           this.state.showAnnotationsOverlay = false;
 
-          console.log('Setting value to: ', annotationSelected);
-
           // Set value for cell
           this.state.value = annotationSelected+1;
         } else {
@@ -130,8 +146,8 @@
   Cell.prototype.drawAnnotationSelector = function (ctx) {
     var annotationSelectionWidth = this.state.scaledSize / 3,
         heightOffset = 0,
-        nudgeOffset = this.state.scaledSize * 0.06,
-        scaledFontSize = this.state.scaledSize * 0.3;
+        nudgeOffset = this.state.scaledSize * this.config.annotations.padding,
+        scaledFontSize = this.state.scaledSize * this.config.annotations.fontSize;
 
     if (this.state.showAnnotationsOverlay === true) {
       for (var i=0; i < 9; i++) {
@@ -139,12 +155,12 @@
           heightOffset++;
         }
 
-        ctx.font = scaledFontSize + "px serif";
+        ctx.font = scaledFontSize + "px " + this.config.annotations.font;
         
         if (this.state.annotationHighlighted === i) {
-          ctx.fillStyle = '#ff0000';
+          ctx.fillStyle = this.config.annotations.hoverColor;
         } else {
-          ctx.fillStyle = '#cccccc';
+          ctx.fillStyle = this.config.annotations.color;
         }
         
         ctx.fillText(
@@ -159,16 +175,16 @@
   Cell.prototype.drawAnnotations = function (ctx) {
     var annotationSelectionWidth = this.state.scaledSize / 3,
         heightOffset = 0,
-        nudgeOffset = this.state.scaledSize * 0.06,
-        scaledFontSize = this.state.scaledSize * 0.3;
+        nudgeOffset = this.state.scaledSize * this.config.annotations.padding,
+        scaledFontSize = this.state.scaledSize * this.config.annotations.fontSize;
 
     for (var i=0; i < 9; i++) {
       if (i % 3 === 0) {
         heightOffset++;
       }
 
-      ctx.font = scaledFontSize + "px serif";
-      ctx.fillStyle = '#ff0000';
+      ctx.font = scaledFontSize + "px " + this.config.annotations.font;
+      ctx.fillStyle = this.config.annotations.hoverColor;
       
       if (this.state.annotations.indexOf(i) > -1) {
         ctx.fillText(
@@ -182,18 +198,24 @@
 
   Cell.prototype.drawValue = function (ctx) {
     if (this.state.value !== null) {
-      ctx.font = this.state.scaledSize * 0.6 + "px serif";
+      ctx.font = this.state.scaledSize * 
+                 this.config.selection.fontSize + "px " +
+                 this.config.selection.font;
       
       if (this.state.valueUserEntered === true) {
-        ctx.fillStyle = '#ff0000';  
+        ctx.fillStyle = this.config.selection.userSelectedColor;  
       } else {
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = this.config.selection.nonMutableColor;
       }
       
       ctx.fillText(
         this.state.value,
-        2+this.state.scaledPosition.x + (this.state.scaledSize * 0.6 / 2),
-        5+this.state.scaledPosition.y + (this.state.scaledSize * 0.6)
+        this.config.selection.paddingLeft       + 
+                    this.state.scaledPosition.x + 
+                    (this.state.scaledSize * this.config.selection.fontSize / 2),
+        this.config.selection.paddingTop        +
+                    this.state.scaledPosition.y + 
+                    (this.state.scaledSize * this.config.selection.fontSize)
       );
     }
   };

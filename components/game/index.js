@@ -10,28 +10,24 @@
     this.canvas = document.getElementById(canvasNodeId);
     this.ctx = this.canvas.getContext('2d');
 
-    this.grid = new Grid();
-
     this.state = {
-      isMobile : window.innerWidth < 768,
+      grid : new Grid(),
+      isMobile : this.isMobile(),
       mouseclick : null,
       mouseposition : null,
       mousedblclick : null,
       isWon: false,
       canvasSize : {
-        h: null,
-        w: null
+        h: this.getCanvasSize(),
+        w: this.getCanvasSize()
       }
     };
-
-    this.updateCanvasSize();
 
     // Re-bind so we can unbind and maintain function ref
     this.gameLoop = this.gameLoop.bind(this);
     this.tick = this.tick.bind(this);
     this.draw = this.draw.bind(this);
     this.listenForUserInput = this.listenForUserInput.bind(this);
-    this.updateCanvasSize = this.updateCanvasSize.bind(this);
   };
 
   Game.prototype.initialize = function () {
@@ -47,8 +43,8 @@
     for (var c in cells) {
       if (!cells.hasOwnProperty(c)) continue;
 
-      this.grid.state.cells[c].state.value = cells[c];
-      this.grid.state.cells[c].state.valueUserEntered = false;
+      this.state.grid.state.cells[c].state.value = cells[c];
+      this.state.grid.state.cells[c].state.valueUserEntered = false;
     }
   };
 
@@ -61,8 +57,8 @@
       for (var y = 0; y < 9; y++) {
         var rowKey = x + '-' + y,
             colKey = y + '-' + x,
-            rowVal = this.grid.state.cells[rowKey].state.value,
-            colVal = this.grid.state.cells[colKey].state.value;
+            rowVal = this.state.grid.state.cells[rowKey].state.value,
+            colVal = this.state.grid.state.cells[colKey].state.value;
 
         if (rowUniq.indexOf(rowVal) > -1 || colUniq.indexOf(colVal) > -1) {
           return false;
@@ -80,7 +76,7 @@
       for (var x = s*3; x < s*3+3; x++) {
         for (var y = s*3; y < s*3+3; y++) {
           var key = (x) + '-' + (y),
-              val = this.grid.state.cells[key].state.value;
+              val = this.state.grid.state.cells[key].state.value;
 
           if (val === null) {
             return false;
@@ -98,16 +94,13 @@
     return true;
   };
 
-  Game.prototype.updateCanvasSize = function () {
-    this.state.isMobile = window.innerWidth < 768;
+  Game.prototype.getCanvasSize = function () {
+    var width = this.isMobile() ? window.innerWidth : 500;
+    return width;
+  };
 
-    var width = this.state.isMobile ? window.innerWidth : 500;
-
-    this.state.canvasSize.w = width;
-    this.state.canvasSize.h = width;
-
-    this.canvas.width = this.state.canvasSize.w;
-    this.canvas.height = this.state.canvasSize.h;
+  Game.prototype.isMobile = function () {
+    return window.innerWidth < 768;
   };
 
   Game.prototype.listenForWindowResize = function () {
@@ -168,8 +161,11 @@
   };
 
   Game.prototype.tick = function () {
+    this.canvas.width = this.state.canvasSize.w;
+    this.canvas.height = this.state.canvasSize.h;
+
     if (this.checkIfWon() === false) {
-      this.grid.tick(this.state);
+      this.state.grid.tick(this.state);
     }
 
     this.state.mouseclick = null;
@@ -179,7 +175,7 @@
   Game.prototype.draw = function (ctx) {
     if (this.checkIfWon() === false) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.grid.draw(ctx);
+      this.state.grid.draw(ctx);
     } else {
       this.drawWinScreen(ctx);
     }

@@ -6,3 +6,5 @@ if (window.__karma__) {
 }
 
 require('../components/game/index.spec');
+require('../components/grid/index.spec');
+require('../components/cell/index.spec');
